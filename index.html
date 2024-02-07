@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+    <title>Minesweeper</title>
+    <link rel="stylesheet" href="css/app.css">
+
+</head>
+<body onload="onInit()">
+
+    <div class="game-level">
+        <h4>difficulty:</h4>
+        <button onclick="onSetLevel(4, 2)">easy</button>
+        <button onclick="onSetLevel(8, 14)">medium</button>
+        <button onclick="onSetLevel(12, 32)">hard</button>
+    </div>
+
+    <button class="reset-button" onclick="onInit()">😃</button>
+    
+    <table class="minefield-container">
+        <tbody class="minefield"></tbody>
+    </table>
+
+    <script src="js/utils.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
+
