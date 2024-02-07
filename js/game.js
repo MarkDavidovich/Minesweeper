@@ -1,5 +1,5 @@
 'use strict'
-console.log("<------ WORK IN PROGRESS! ------>")
+console.log("<------ WORK IN PRfOGRESS! ------>")
 const MINE = '💣'
 const FLAG = '🚩'
 
@@ -19,13 +19,15 @@ var gTimerInterval
 
 function onInit() {
     var elWinEmoji = document.querySelector(".reset-button")
+    var elLives = document.querySelector(".lives span")
     elWinEmoji.innerHTML = '😀'
+    elLives.innerText = '💖'
+
     clearInterval(gTimerInterval)
     gGame.secsPassed = -1
     updateTimer()
 
-    // gGame.lives = 3
-    // updateLives(gGame.lives)
+    gGame.lives = 3
     gGame.markedCount = 0
     gGame.shownCount = 0
     gGame.secsPassed = 0
@@ -35,6 +37,7 @@ function onInit() {
 }
 
 function buildBoard() {
+    
     const size = gLevel.size
     const board = []
 
@@ -108,24 +111,22 @@ function onCellClicked(elCell, i, j) {
             console.log('FIRST CELL WAS A MINE!')
             gBoard = buildBoard()
             cellClicked = gBoard[i][j]
-            // updateLives
         }
     }
 
     if (cellClicked.isMine === true) {
         elCell.classList.add('explosion')
         elCell.innerHTML = MINE
-        checkGameOver(0)
-        // updateLives(-1)
+        updateLives(-1)
     } else {
         cellClicked.isShown = true
         gGame.shownCount++
         elCell.innerHTML = cellClicked.minesAroundCount > 0 ? cellClicked.minesAroundCount : ''
         if (gGame.shownCount === gLevel.size ** 2 - gLevel.mines) checkGameOver(1) // probably need to change this
-    }
 
-    if (cellClicked.minesAroundCount === 0) {
-        expandNegs(gBoard, elCell, i, j);
+        if (cellClicked.minesAroundCount === 0) {
+            expandNegs(gBoard, elCell, i, j);
+        }
     }
     // ADD A CONDITION OF FLAGS TO WIN
 
@@ -236,7 +237,7 @@ function expandNegs(board, elCell, cellI, cellJ) {
                 currCell.isShown = true
                 gGame.shownCount++
 
-                if (currCell.minesAroundCount === 0) {
+                if (currCell.minesAroundCount === 0 && !currCell.isMine) {
                     expandNegs(board, currElement, i, j)
                 }
                 currElement.innerHTML = currCell.minesAroundCount > 0 ? currCell.minesAroundCount : ''
@@ -245,15 +246,16 @@ function expandNegs(board, elCell, cellI, cellJ) {
     }
 }
 
-// function updateLives(diff) {
-//     console.log('gGame.lives', gGame.lives)
-//     gGame.lives += diff
-//     var elLives = document.querySelector('.lives span')
-//     if (gGame.lives === 2) elLives.innerHTML = '❤️'
-//     else if (gGame.lives === 1) elLives.innerHTML = '❤️‍🩹'
-//     else if (gGame.lives === 0) {
-//         elLives.innerText = '💔'
-//         checkGameOver(0)
-//     }
+function updateLives(diff) {
+    
+    gGame.lives += diff
+    console.log('gGame.lives', gGame.lives)
+    var elLives = document.querySelector('.lives span')
+    if (gGame.lives >= 2) elLives.innerHTML = '❤️'
+    else if (gGame.lives === 1) elLives.innerHTML = '❤️‍🩹'
+    else if (gGame.lives === 0) {
+        elLives.innerText = '💔'
+        checkGameOver(0)
+    }
 
-// }
+}
