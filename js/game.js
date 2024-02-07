@@ -12,7 +12,8 @@ var gGame = {
     isOn: false,
     shownCount: 0,
     markedCount: 0,
-    secsPassed: 0
+    secsPassed: 0,
+    lives: 0
 }
 var gTimerInterval
 
@@ -23,6 +24,8 @@ function onInit() {
     gGame.secsPassed = -1
     updateTimer()
 
+    // gGame.lives = 3
+    // updateLives(gGame.lives)
     gGame.markedCount = 0
     gGame.shownCount = 0
     gGame.secsPassed = 0
@@ -100,17 +103,29 @@ function onCellClicked(elCell, i, j) {
 
     if (gGame.shownCount === 0) {
         gTimerInterval = setInterval(updateTimer, 1000)
+
+        while (cellClicked.isMine) { //makes sure the first cell clicked is not a mine
+            console.log('FIRST CELL WAS A MINE!')
+            gBoard = buildBoard()
+            cellClicked = gBoard[i][j]
+            // updateLives
+        }
     }
 
     if (cellClicked.isMine === true) {
         elCell.classList.add('explosion')
         elCell.innerHTML = MINE
         checkGameOver(0)
+        // updateLives(-1)
     } else {
         cellClicked.isShown = true
         gGame.shownCount++
         elCell.innerHTML = cellClicked.minesAroundCount > 0 ? cellClicked.minesAroundCount : ''
         if (gGame.shownCount === gLevel.size ** 2 - gLevel.mines) checkGameOver(1) // probably need to change this
+    }
+
+    if (cellClicked.minesAroundCount === 0) {
+        expandNegs(gBoard, elCell, i, j);
     }
     // ADD A CONDITION OF FLAGS TO WIN
 
@@ -118,7 +133,7 @@ function onCellClicked(elCell, i, j) {
 
 function onCellRightClicked(event, elCell, i, j) {
 
-    event.preventDefault(); // prevent context menu
+    event.preventDefault() // prevent context menu
 
     if (!gGame.isOn) return
 
@@ -206,4 +221,39 @@ function updateTimer() {
     document.querySelector('.timer span').innerText = gGame.secsPassed
 }
 
+function expandNegs(board, elCell, cellI, cellJ) {
+    for (let i = cellI - 1; i <= cellI + 1; i++) {
+        if (i < 0 || i >= board.length) continue
+        for (let j = cellJ - 1; j <= cellJ + 1; j++) {
+            if (i === cellI && j === cellJ) continue
+            if (j < 0 || j >= board[i].length) continue
 
+            const currCell = board[i][j]
+            const currElement = document.querySelector(`.minefield tr:nth-child(${i + 1}) td:nth-child(${j + 1})`)
+
+            if (!currCell.isShown && !currCell.isMarked) {
+                currElement.style.outlineStyle = 'inset'
+                currCell.isShown = true
+                gGame.shownCount++
+
+                if (currCell.minesAroundCount === 0) {
+                    expandNegs(board, currElement, i, j)
+                }
+                currElement.innerHTML = currCell.minesAroundCount > 0 ? currCell.minesAroundCount : ''
+            }
+        }
+    }
+}
+
+// function updateLives(diff) {
+//     console.log('gGame.lives', gGame.lives)
+//     gGame.lives += diff
+//     var elLives = document.querySelector('.lives span')
+//     if (gGame.lives === 2) elLives.innerHTML = '❤️'
+//     else if (gGame.lives === 1) elLives.innerHTML = '❤️‍🩹'
+//     else if (gGame.lives === 0) {
+//         elLives.innerText = '💔'
+//         checkGameOver(0)
+//     }
+
+// }
