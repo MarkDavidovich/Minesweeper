@@ -1,6 +1,5 @@
 'use strict'
 console.log("<------ WORK IN PROGRESS! ------>")
-// const BUTTON = '😃'
 const MINE = '💣'
 const FLAG = '🚩'
 
@@ -15,10 +14,18 @@ var gGame = {
     markedCount: 0,
     secsPassed: 0
 }
+var gTimerInterval
 
 function onInit() {
+    var elWinEmoji = document.querySelector(".reset-button")
+    elWinEmoji.innerHTML = '😀'
+    clearInterval(gTimerInterval)
+    gGame.secsPassed = -1
+    updateTimer()
+
     gGame.markedCount = 0
     gGame.shownCount = 0
+    gGame.secsPassed = 0
     gGame.isOn = true
     gBoard = buildBoard()
     renderBoard(gBoard)
@@ -39,14 +46,25 @@ function buildBoard() {
             }
             board[i][j] = cell
 
-            if (i === 1 && j === 2 || i === 3 && j === 3) {
-                board[i][j].isMine = true
-            } 
+            // if (i === 1 && j === 2 || i === 3 && j === 3) { // hardcoded mines
+            //     board[i][j].isMine = true
+            // } 
 
         }
     }
+
+    var minesPlaced = 0
+    while (minesPlaced < gLevel.mines) {
+        const randRow = getRandomIntInclusive(0, size - 1)
+        const randCol = getRandomIntInclusive(0, size - 1)
+
+        if (!board[randRow][randCol].isMine) {
+            board[randRow][randCol].isMine = true
+            minesPlaced++
+        }
+    }
+
     setMinesNegsCount(board)
-    // console.log(board)
     return board
 }
 
@@ -80,6 +98,10 @@ function onCellClicked(elCell, i, j) {
     console.log('Cell clicked:', i, j)
     elCell.style.outlineStyle = 'inset'
 
+    if (gGame.shownCount === 0) {
+        gTimerInterval = setInterval(updateTimer, 1000)
+    }
+
     if (cellClicked.isMine === true) {
         elCell.classList.add('explosion')
         elCell.innerHTML = MINE
@@ -87,13 +109,10 @@ function onCellClicked(elCell, i, j) {
     } else {
         cellClicked.isShown = true
         gGame.shownCount++
-        console.log('gGame.shownCount', gGame.shownCount)
         elCell.innerHTML = cellClicked.minesAroundCount > 0 ? cellClicked.minesAroundCount : ''
         if (gGame.shownCount === gLevel.size ** 2 - gLevel.mines) checkGameOver(1) // probably need to change this
     }
-    
     // ADD A CONDITION OF FLAGS TO WIN
-
 
 }
 
@@ -111,23 +130,27 @@ function onCellRightClicked(event, elCell, i, j) {
 
     if (cellClicked.isMarked && cellClicked.isMine) {
         gGame.markedCount++
-        console.log('gGame.markedCount', gGame.markedCount)
         if (gGame.markedCount === gLevel.mines) checkGameOver(1)
     }
     else if (!cellClicked.isMarked && cellClicked.isMine) {
         gGame.markedCount--
-        console.log('gGame.markedCount', gGame.markedCount)
     }
     // ADD CONDITION OF SHOWN CELLS TO WIN
 }
 
 function checkGameOver(hasWon) {
+
     gGame.isOn = false
     var message = ''
+    clearInterval(gTimerInterval)
     if (hasWon) {
+        var elWinEmoji = document.querySelector(".reset-button")
+        elWinEmoji.innerHTML = '😎'
         message = "You won!"
 
     } else {
+        var elWinEmoji = document.querySelector(".reset-button")
+        elWinEmoji.innerHTML = '😵'
         message = "Boom! you lose..."
         showAllMines()
     }
@@ -146,7 +169,6 @@ function showAllMines() {
 
     for (let i = 0; i < elMineCells.length; i++) {
         const elMineCell = elMineCells[i]
-        elMineCell.classList.add('explosion')
         elMineCell.innerHTML = MINE
         elMineCell.style.outlineStyle = 'inset'
     }
@@ -178,3 +200,10 @@ function countNeighborsMines(board, row, col) {
 
     return minesCount
 }
+
+function updateTimer() {
+    gGame.secsPassed++
+    document.querySelector('.timer span').innerText = gGame.secsPassed
+}
+
+

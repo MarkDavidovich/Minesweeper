@@ -1,6 +1,7 @@
 * {
   font-family: 'Press Start 2P';
 }
+
 body {
   background-color: rgb(44, 44, 44);
   color: rgb(218, 218, 218);
@@ -14,12 +15,18 @@ body {
 
 .game-level {
   width: 100px;
-  position:absolute;
+  position: absolute;
 }
+
 .game-level button {
-  padding: 15px; 
+  padding: 15px;
   background-color: rgb(44, 44, 44);
   color: rgb(218, 218, 218);
+}
+
+.timer {
+  font-size: 18px;
+  font-weight: bold;
 }
 
 .minefield-container {
@@ -46,7 +53,5 @@ body {
 .explosion {
   font-size: 50px;
   background-color: red;
-  
+
 }
-
-
