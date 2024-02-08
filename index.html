@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,27 +9,34 @@
     <link rel="stylesheet" href="css/app.css">
 
 </head>
+
 <body onload="onInit()">
 
     <div class="game-level">
-        <h4>difficulty:</h4>
-        <button onclick="onSetLevel(4, 2)">easy</button>
-        <button onclick="onSetLevel(8, 14)">medium</button>
-        <button onclick="onSetLevel(12, 32)">hard</button>
+        <span>
+            <button onclick="onSetLevel(4, 2)">easy</button>
+            <button onclick="onSetLevel(8, 14)">medium</button>
+            <button onclick="onSetLevel(12, 32)">hard</button>
+        </span>
     </div>
-    
-    <div class="timer">Time: <span></span></div>
-    <div class="lives">Lives: <span></span></div>
 
-    
+    <div class="timer">Time:<span></span></div>
+    <div class="lives">Lives:<span></span></div>
+
+    <div class="hints">
+        <button class="hint-button" onclick="onHintClicked(this)">use hint (3 left)</button>
+    </div>
+
+
     <button class="reset-button" onclick="onInit()"></button>
-    
+
     <table class="minefield-container">
         <tbody class="minefield"></tbody>
     </table>
 
     <script src="js/utils.js"></script>
+    <script src="js/hints.js"></script>
     <script src="js/game.js"></script>
 </body>
-</html>
 
+</html>

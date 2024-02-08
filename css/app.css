@@ -11,22 +11,42 @@ body {
 
 .reset-button {
   background-color: rgb(44, 44, 44);
+  cursor: pointer;
 }
 
 .game-level {
-  width: 100px;
   position: absolute;
+  cursor: pointer;
 }
 
 .game-level button {
-  padding: 15px;
+  font-size: 12px;
+  padding: 5px;
   background-color: rgb(44, 44, 44);
   color: rgb(218, 218, 218);
+  cursor: pointer;
+}
+
+.lives {
+  font-size: 12px;
+
 }
 
 .timer {
-  font-size: 18px;
-  font-weight: bold;
+  font-size: 12px;
+}
+
+.hints {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.hint-button {
+  font-size: 12px;
+  padding: 5px;
+  background-color: rgb(44, 44, 44);
+  color: rgb(218, 218, 218);
+  cursor: pointer;
 }
 
 .minefield-container {
@@ -40,7 +60,6 @@ body {
   text-align: center;
   cursor: pointer;
   font-size: 15px;
-  font-weight: bold;
   outline-width: 2px;
   outline-color: rgb(0, 0, 0);
   outline-style: outset;
@@ -54,4 +73,8 @@ body {
   font-size: 50px;
   background-color: red;
 
+}
+
+.clicked {
+  color: yellow;
 }

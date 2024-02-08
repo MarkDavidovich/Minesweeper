@@ -2,6 +2,7 @@
 console.log("<------ WORK IN PRfOGRESS! ------>")
 const MINE = '💣'
 const FLAG = '🚩'
+const ONE_SECOND = 1000;
 
 var gBoard = []
 var gLevel = {
@@ -15,19 +16,32 @@ var gGame = {
     secsPassed: 0,
     lives: 0
 }
+var gMinesMarked
+
 var gTimerInterval
 
+var gHints
+var gIsHintActive
+
 function onInit() {
+    //lives 
     var elWinEmoji = document.querySelector(".reset-button")
     var elLives = document.querySelector(".lives span")
     elWinEmoji.innerHTML = '😀'
     elLives.innerText = '💖'
+    gGame.lives = 3
 
+    //timer
     clearInterval(gTimerInterval)
     gGame.secsPassed = -1
     updateTimer()
 
-    gGame.lives = 3
+    //hints
+    gHints = 3
+    gIsHintActive = false
+
+    //board init
+    gMinesMarked = 0
     gGame.markedCount = 0
     gGame.shownCount = 0
     gGame.secsPassed = 0
@@ -37,7 +51,7 @@ function onInit() {
 }
 
 function buildBoard() {
-    
+
     const size = gLevel.size
     const board = []
 
@@ -101,11 +115,15 @@ function onCellClicked(elCell, i, j) {
 
     if (cellClicked.isMarked || cellClicked.isShown) return
 
+
+    if (gIsHintActive) {
+
+    }
     console.log('Cell clicked:', i, j)
     elCell.style.outlineStyle = 'inset'
 
     if (gGame.shownCount === 0) {
-        gTimerInterval = setInterval(updateTimer, 1000)
+        gTimerInterval = setInterval(updateTimer, ONE_SECOND)
 
         while (cellClicked.isMine) { //makes sure the first cell clicked is not a mine
             console.log('FIRST CELL WAS A MINE!')
@@ -117,19 +135,24 @@ function onCellClicked(elCell, i, j) {
     if (cellClicked.isMine === true) {
         elCell.classList.add('explosion')
         elCell.innerHTML = MINE
+        cellClicked.isShown = true
         updateLives(-1)
+        gMinesMarked++
+        
     } else {
         cellClicked.isShown = true
         gGame.shownCount++
         elCell.innerHTML = cellClicked.minesAroundCount > 0 ? cellClicked.minesAroundCount : ''
-        if (gGame.shownCount === gLevel.size ** 2 - gLevel.mines) checkGameOver(1) // probably need to change this
+        console.log('gGame.shownCount', gGame.shownCount)
+         // probably need to change this
 
         if (cellClicked.minesAroundCount === 0) {
             expandNegs(gBoard, elCell, i, j);
         }
     }
-    // ADD A CONDITION OF FLAGS TO WIN
 
+    if (gGame.shownCount === gLevel.size ** 2 - gLevel.mines) checkGameOver(1)
+    if (gMinesMarked === gLevel.mines) checkGameOver(1)
 }
 
 function onCellRightClicked(event, elCell, i, j) {
@@ -140,18 +163,25 @@ function onCellRightClicked(event, elCell, i, j) {
 
     var cellClicked = gBoard[i][j]
 
+    if (cellClicked.isShown) return
+
     cellClicked.isMarked = !cellClicked.isMarked
 
     elCell.innerHTML = cellClicked.isMarked ? FLAG : ''
 
-    if (cellClicked.isMarked && cellClicked.isMine) {
+    if (cellClicked.isMarked) {
         gGame.markedCount++
-        if (gGame.markedCount === gLevel.mines) checkGameOver(1)
-    }
-    else if (!cellClicked.isMarked && cellClicked.isMine) {
+
+        if (cellClicked.isMine) {
+            gMinesMarked++
+        }
+    } else {
+        if (cellClicked.isMine) gMinesMarked--
         gGame.markedCount--
+
     }
-    // ADD CONDITION OF SHOWN CELLS TO WIN
+
+    if (gGame.markedCount === gMinesMarked && gMinesMarked === gLevel.mines) checkGameOver(1)
 }
 
 function checkGameOver(hasWon) {
@@ -159,11 +189,11 @@ function checkGameOver(hasWon) {
     gGame.isOn = false
     var message = ''
     clearInterval(gTimerInterval)
+
     if (hasWon) {
         var elWinEmoji = document.querySelector(".reset-button")
         elWinEmoji.innerHTML = '😎'
         message = "You won!"
-
     } else {
         var elWinEmoji = document.querySelector(".reset-button")
         elWinEmoji.innerHTML = '😵'
@@ -247,7 +277,7 @@ function expandNegs(board, elCell, cellI, cellJ) {
 }
 
 function updateLives(diff) {
-    
+
     gGame.lives += diff
     console.log('gGame.lives', gGame.lives)
     var elLives = document.querySelector('.lives span')
