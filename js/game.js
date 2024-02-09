@@ -19,17 +19,17 @@ var gGame = {
 var gMinesMarked
 
 var gTimerInterval
-
-var gHints
-var gIsHintActive
+var gHintTimeout
 
 function onInit() {
     //lives 
     var elWinEmoji = document.querySelector(".reset-button")
     var elLives = document.querySelector(".lives span")
+
     elWinEmoji.innerHTML = '😀'
     elLives.innerText = '💖'
     gGame.lives = 3
+
 
     //timer
     clearInterval(gTimerInterval)
@@ -37,8 +37,11 @@ function onInit() {
     updateTimer()
 
     //hints
+    var elHintButton = document.querySelector(".hint-button")
+    elHintButton.style.backgroundColor = ''
     gHints = 3
     gIsHintActive = false
+    clearTimeout(gHintTimeout)
 
     //board init
     gMinesMarked = 0
@@ -109,6 +112,7 @@ function renderBoard(board) {
 }
 
 function onCellClicked(elCell, i, j) {
+    //Need to split this function into smaller functions... sometime
     if (!gGame.isOn) return
 
     var cellClicked = gBoard[i][j]
@@ -116,8 +120,27 @@ function onCellClicked(elCell, i, j) {
     if (cellClicked.isMarked || cellClicked.isShown) return
 
 
+
     if (gIsHintActive) {
 
+        const previousBoard = cloneBoard(gBoard)
+
+        revealNeighbors(gBoard, elCell, i, j)
+
+        gHintTimeout = setTimeout(() => {
+            console.log("ONE SECOND HAS PASSED")
+            gBoard = previousBoard
+            renderBoard(gBoard)
+        }, ONE_SECOND)
+
+
+        gHints--
+        console.log('gHints', gHints)
+        gIsHintActive = false
+        
+        var elHintButton = document.querySelector('.hint-button')
+        elHintButton.style.backgroundColor = ''
+        return
     }
     console.log('Cell clicked:', i, j)
     elCell.style.outlineStyle = 'inset'
@@ -138,16 +161,15 @@ function onCellClicked(elCell, i, j) {
         cellClicked.isShown = true
         updateLives(-1)
         gMinesMarked++
-        
+
     } else {
         cellClicked.isShown = true
         gGame.shownCount++
         elCell.innerHTML = cellClicked.minesAroundCount > 0 ? cellClicked.minesAroundCount : ''
         console.log('gGame.shownCount', gGame.shownCount)
-         // probably need to change this
 
         if (cellClicked.minesAroundCount === 0) {
-            expandNegs(gBoard, elCell, i, j);
+            revealNeighbors(gBoard, elCell, i, j, true);
         }
     }
 
@@ -252,11 +274,11 @@ function updateTimer() {
     document.querySelector('.timer span').innerText = gGame.secsPassed
 }
 
-function expandNegs(board, elCell, cellI, cellJ) {
+function revealNeighbors(board, elCell, cellI, cellJ) {
     for (let i = cellI - 1; i <= cellI + 1; i++) {
         if (i < 0 || i >= board.length) continue
         for (let j = cellJ - 1; j <= cellJ + 1; j++) {
-            if (i === cellI && j === cellJ) continue
+            if (!gIsHintActive && i === cellI && j === cellJ) continue // if hint click, will check clicked cell too
             if (j < 0 || j >= board[i].length) continue
 
             const currCell = board[i][j]
@@ -267,10 +289,11 @@ function expandNegs(board, elCell, cellI, cellJ) {
                 currCell.isShown = true
                 gGame.shownCount++
 
-                if (currCell.minesAroundCount === 0 && !currCell.isMine) {
-                    expandNegs(board, currElement, i, j)
+                if (!gIsHintActive && currCell.minesAroundCount === 0 && !currCell.isMine) { // if hint click, will not activate recursion
+                    revealNeighbors(board, currElement, i, j, true)
                 }
                 currElement.innerHTML = currCell.minesAroundCount > 0 ? currCell.minesAroundCount : ''
+                if (gIsHintActive && currCell.isMine) currElement.innerHTML = MINE // if hint click, will reveal mines
             }
         }
     }
@@ -281,11 +304,12 @@ function updateLives(diff) {
     gGame.lives += diff
     console.log('gGame.lives', gGame.lives)
     var elLives = document.querySelector('.lives span')
-    if (gGame.lives >= 2) elLives.innerHTML = '❤️'
-    else if (gGame.lives === 1) elLives.innerHTML = '❤️‍🩹'
+    if (gGame.lives >= 2) elLives.innerText = '❤️'
+    else if (gGame.lives === 1) elLives.innerText = '❤️‍🩹'
     else if (gGame.lives === 0) {
         elLives.innerText = '💔'
         checkGameOver(0)
     }
 
 }
+

@@ -1,21 +1,27 @@
 'use strict'
 
+var gHints
+var gIsHintActive
+
 
 function onHintClicked(elHintButton) {
 
+   
     if (!gGame.isOn || gHints === 0) return
 
-    else if (gHints > 0 && gIsHintActive) {
-
-        gIsHintActive = false
-    } 
-
-    cloneBoard(gBoard)
-
-    gIsHintActive = true;
-    gHints--
-    console.log('elHintButton', elHintButton)
-    elHintButton.style.backgroundColor = 'blue'
+    gIsHintActive = !gIsHintActive
+    console.log(gIsHintActive)
+    if (gIsHintActive) {
+        elHintButton.style.backgroundColor = 'blue'
+    } else {
+        elHintButton.style.backgroundColor = ''
+    }
+    // const clonedBoard = cloneBoard(gBoard)
+    // console.log('clonedBoard', clonedBoard)
+    // gIsHintActive = true
+    // gHints--
+    // console.log('elHintButton', elHintButton)
+    
 
 }
 
