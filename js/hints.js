@@ -3,10 +3,7 @@
 var gHints
 var gIsHintActive
 
-
 function onHintClicked(elHintButton) {
-
-   
     if (!gGame.isOn || gHints === 0) return
 
     gIsHintActive = !gIsHintActive
@@ -16,15 +13,32 @@ function onHintClicked(elHintButton) {
     } else {
         elHintButton.style.backgroundColor = ''
     }
-    // const clonedBoard = cloneBoard(gBoard)
-    // console.log('clonedBoard', clonedBoard)
-    // gIsHintActive = true
-    // gHints--
-    // console.log('elHintButton', elHintButton)
-    
-
 }
 
+function hintReveal(elCell, i, j) {
+    const previousBoard = cloneBoard(gBoard)
+    console.log('previousBoard', previousBoard)
+
+    revealNeighbors(gBoard, elCell, i, j)
+
+    gHintTimeout = setTimeout(() => {
+        console.log("ONE SECOND HAS PASSED")
+        gBoard = previousBoard
+        renderBoard(gBoard)
+    }, ONE_SECOND)
+
+
+    gHints--
+    console.log('gHints', gHints)
+    gIsHintActive = false
+
+    var elHintButton = document.querySelector('.hint-button')
+    elHintButton.style.backgroundColor = ''
+    startTimer()
+    if (gHints === 0) {
+        elHintButton.disabled = true
+    }
+}
 
 function cloneBoard(board) {
     const size = board.length
@@ -38,7 +52,7 @@ function cloneBoard(board) {
                 isShown: board[i][j].isShown,
                 isMine: board[i][j].isMine,
                 isMarked: board[i][j].isMarked
-            };
+            }
             row.push(cell)
         }
         clonedBoard.push(row)

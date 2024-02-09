@@ -20,6 +20,7 @@ var gMinesMarked
 
 var gTimerInterval
 var gHintTimeout
+var gSafeClicks
 
 function onInit() {
     //lives 
@@ -33,6 +34,7 @@ function onInit() {
 
     //timer
     clearInterval(gTimerInterval)
+    gTimerInterval = null
     gGame.secsPassed = -1
     updateTimer()
 
@@ -41,7 +43,13 @@ function onInit() {
     elHintButton.style.backgroundColor = ''
     gHints = 3
     gIsHintActive = false
+    elHintButton.disabled = false
     clearTimeout(gHintTimeout)
+
+    //safe clicks
+    const elSafeButton = document.querySelector(`.safe-click`)
+    elSafeButton.disabled = false
+    gSafeClicks = 3
 
     //board init
     gMinesMarked = 0
@@ -97,11 +105,19 @@ function renderBoard(board) {
         strHTML += '<tr>'
         for (let j = 0; j < gLevel.size; j++) {
             const currCell = board[i][j]
-
-            if (currCell.isMine) {
-                strHTML += `<td class="mine" onclick="onCellClicked(this, ${i}, ${j})" oncontextmenu="onCellRightClicked(event, this, ${i}, ${j})"></td>`
+            const minesAroundCell = board[i][j].minesAroundCount
+            // if (currCell.isShown) {
+            //     strHTML += `<td onclick="onCellClicked(this, ${i}, ${j})" oncontextmenu="onCellRightClicked(event, this, ${i}, ${j})"></td>`
+            // }
+            if (currCell.isMine && currCell.isShown) {
+                strHTML += `<td class="explosion" style="outline-style: inset">${MINE}</td>`
             }
-            else {
+            else if (currCell.isShown) {
+                strHTML += `<td style="outline-style: inset">${minesAroundCell ? minesAroundCell : ''}</td>`
+            }
+            else if (currCell.isMine) {
+                strHTML += `<td class="mine" onclick="onCellClicked(this, ${i}, ${j})" oncontextmenu="onCellRightClicked(event, this, ${i}, ${j})"></td>`
+            } else {
                 strHTML += `<td onclick="onCellClicked(this, ${i}, ${j})" oncontextmenu="onCellRightClicked(event, this, ${i}, ${j})"</td>`
             }
         }
@@ -122,31 +138,16 @@ function onCellClicked(elCell, i, j) {
 
 
     if (gIsHintActive) {
-
-        const previousBoard = cloneBoard(gBoard)
-
-        revealNeighbors(gBoard, elCell, i, j)
-
-        gHintTimeout = setTimeout(() => {
-            console.log("ONE SECOND HAS PASSED")
-            gBoard = previousBoard
-            renderBoard(gBoard)
-        }, ONE_SECOND)
-
-
-        gHints--
-        console.log('gHints', gHints)
-        gIsHintActive = false
         
-        var elHintButton = document.querySelector('.hint-button')
-        elHintButton.style.backgroundColor = ''
+        hintReveal(elCell, i, j)
         return
     }
     console.log('Cell clicked:', i, j)
+
     elCell.style.outlineStyle = 'inset'
 
     if (gGame.shownCount === 0) {
-        gTimerInterval = setInterval(updateTimer, ONE_SECOND)
+        startTimer()
 
         while (cellClicked.isMine) { //makes sure the first cell clicked is not a mine
             console.log('FIRST CELL WAS A MINE!')
@@ -156,21 +157,17 @@ function onCellClicked(elCell, i, j) {
     }
 
     if (cellClicked.isMine === true) {
-        elCell.classList.add('explosion')
-        elCell.innerHTML = MINE
-        cellClicked.isShown = true
-        updateLives(-1)
-        gMinesMarked++
-
+        clickedOnMine(elCell, cellClicked)
     } else {
-        cellClicked.isShown = true
-        gGame.shownCount++
-        elCell.innerHTML = cellClicked.minesAroundCount > 0 ? cellClicked.minesAroundCount : ''
-        console.log('gGame.shownCount', gGame.shownCount)
+        clickedOnSafe(elCell, cellClicked, i, j)
+        // cellClicked.isShown = true
+        // gGame.shownCount++
+        // elCell.innerHTML = cellClicked.minesAroundCount > 0 ? cellClicked.minesAroundCount : ''
+        // console.log('gGame.shownCount', gGame.shownCount)
 
-        if (cellClicked.minesAroundCount === 0) {
-            revealNeighbors(gBoard, elCell, i, j, true);
-        }
+        // if (cellClicked.minesAroundCount === 0) {
+        //     revealNeighbors(gBoard, elCell, i, j, true);
+        // }
     }
 
     if (gGame.shownCount === gLevel.size ** 2 - gLevel.mines) checkGameOver(1)
@@ -256,7 +253,7 @@ function setMinesNegsCount(board) {
 
 function countNeighborsMines(board, row, col) {
     const size = gLevel.size
-    let minesCount = 0
+    var minesCount = 0
 
     for (let i = row - 1; i <= row + 1; i++) {
         for (let j = col - 1; j <= col + 1; j++) {
@@ -313,3 +310,67 @@ function updateLives(diff) {
 
 }
 
+function startTimer() {
+    if (!gTimerInterval) {
+        gTimerInterval = setInterval(updateTimer, ONE_SECOND)
+        console.log("TIMER STARTED!")
+    }
+}
+
+function clickedOnMine(elCell, cellClicked) {
+    elCell.classList.add('explosion')
+    elCell.innerHTML = MINE
+    cellClicked.isShown = true
+    updateLives(-1)
+    gMinesMarked++
+
+}
+
+function clickedOnSafe(elCell, cellClicked, i, j) {
+    cellClicked.isShown = true
+    gGame.shownCount++
+    elCell.innerHTML = cellClicked.minesAroundCount > 0 ? cellClicked.minesAroundCount : ''
+    console.log('gGame.shownCount', gGame.shownCount)
+
+    if (cellClicked.minesAroundCount === 0) {
+        revealNeighbors(gBoard, elCell, i, j, true);
+    }
+}
+
+function onSafeClicked() {
+    if (!gGame.isOn) return
+    const emptyCells = getEmptyCells(gBoard)
+    const randIdx = getRandomIntInclusive(0, emptyCells.length - 1)
+    const randomSafeCell = emptyCells[randIdx]
+    const elCell = document.querySelector(`.minefield tr:nth-child(${randomSafeCell.i + 1}) td:nth-child(${randomSafeCell.j + 1})`)
+    const elSafeButton = document.querySelector(`.safe-click`)
+    //Show the safe cell for a few seconds
+    elCell.classList.add("safe-cell")
+    console.log('elCell', elCell)
+    console.log("randomSafeCell:", randomSafeCell)
+    elSafeButton.disabled = true
+
+    setTimeout(() => {
+        elCell.classList.remove("safe-cell")
+        gSafeClicks--
+        if (gSafeClicks) elSafeButton.disabled = false
+    }, 2000)
+
+    startTimer()
+    return
+}
+
+function getEmptyCells(board) {
+    var emptyCells = []
+
+    for (var i = 0; i < board.length; i++) {
+        for (var j = 0; j < board[i].length; j++) {
+            var cell = board[i][j]
+
+            if (!cell.isMine && !cell.isShown) {
+                emptyCells.push({ i: i, j: j })
+            }
+        }
+    }
+    return emptyCells
+}
