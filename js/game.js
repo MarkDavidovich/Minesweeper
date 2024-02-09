@@ -1,5 +1,6 @@
 'use strict'
-console.log("<------ WORK IN PRfOGRESS! ------>")
+console.log("<------ WORK IN PRfOGRESS! ------>\n resetHighScores(4/8/12) to reset high scores of level.")
+
 const MINE = '💣'
 const FLAG = '🚩'
 const ONE_SECOND = 1000;
@@ -50,6 +51,9 @@ function onInit() {
     const elSafeButton = document.querySelector(`.safe-click`)
     elSafeButton.disabled = false
     gSafeClicks = 3
+
+    //scores
+    displayHighScores(gLevel.size)
 
     //board init
     gMinesMarked = 0
@@ -197,7 +201,6 @@ function onCellRightClicked(event, elCell, i, j) {
     } else {
         if (cellClicked.isMine) gMinesMarked--
         gGame.markedCount--
-
     }
 
     if (gGame.markedCount === gMinesMarked && gMinesMarked === gLevel.mines) checkGameOver(1)
@@ -213,6 +216,8 @@ function checkGameOver(hasWon) {
         var elWinEmoji = document.querySelector(".reset-button")
         elWinEmoji.innerHTML = '😎'
         message = "You won!"
+        console.log(gGame.shownCount, gGame.secsPassed)
+        updateHighScores(gLevel.size, gGame.shownCount, gGame.secsPassed)
     } else {
         var elWinEmoji = document.querySelector(".reset-button")
         elWinEmoji.innerHTML = '😵'
