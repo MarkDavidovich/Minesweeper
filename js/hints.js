@@ -3,11 +3,9 @@
 var gHints
 var gIsHintActive
 
-
 var gIsMegaHintActive
 var gFirstClick
 var gSecondClick
-
 
 function onHintClicked() {
     if (!gGame.isOn || gHints === 0) return
@@ -120,7 +118,6 @@ function handleMegaHintError() {
     
 
 }
-
 
 function isInvalidRectangle(cell1, cell2) {
     return (
