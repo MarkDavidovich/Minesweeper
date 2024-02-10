@@ -32,7 +32,7 @@ function onInit() {
     var elLives = document.querySelector(".lives span")
 
     elWinEmoji.innerHTML = '😀'
-    elLives.innerText = '💖'
+    elLives.innerHTML = '<img src="assets/fullheart.png">' 
     gGame.lives = 3
 
 
@@ -74,6 +74,10 @@ function onInit() {
     var elUndoButton = document.querySelector('.undo-button')
     elUndoButton.disabled = true
     gBoards = []
+
+    //exterminator
+    var elExtButton = document.querySelector('.exterminator')
+    elExtButton.disabled = false
 
     //board init
     gMinesMarked = 0
@@ -252,6 +256,8 @@ function checkGameOver(hasWon) {
     var message = ''
     clearInterval(gTimerInterval)
 
+
+
     if (hasWon) {
         var elWinEmoji = document.querySelector(".reset-button")
         elWinEmoji.innerHTML = '😎'
@@ -264,7 +270,15 @@ function checkGameOver(hasWon) {
         message = "Boom! you lose..."
         showAllMines()
     }
-    console.log(message)
+    const elHintButton = document.querySelector('.hint-button')
+    const elSafeButton = document.querySelector('.safe-click')
+    const elMegaHintButton = document.querySelector('.mega-hint-button')
+    const elUndoButton = document.querySelector('.undo-button')
+
+    elHintButton.disabled = true
+    elSafeButton.disabled = true
+    elMegaHintButton.disabled = true
+    elUndoButton.disabled = true
 
 }
 
@@ -344,11 +358,11 @@ function revealNeighbors(board, elCell, cellI, cellJ) {
 function updateLives(diff = 0) {
     gGame.lives += diff
     var elLives = document.querySelector('.lives span')
-    if (gGame.lives === 3) elLives.innerText = '💖'
-    if (gGame.lives === 2) elLives.innerText = '❤️'
-    else if (gGame.lives === 1) elLives.innerText = '❤️‍🩹'
+    if (gGame.lives === 3) elLives.innerHTML = '<img src="assets/fullheart.png">' 
+    if (gGame.lives === 2) elLives.innerHTML = '<img src="assets/twothirdsheart.png">' 
+    else if (gGame.lives === 1) elLives.innerHTML = '<img src="assets/onethirdsheart.png">' 
     else if (gGame.lives === 0) {
-        elLives.innerText = ''
+        elLives.innerHTML = '<img src="assets/emptyheart.png">' 
         checkGameOver(0)
     }
 
@@ -433,10 +447,24 @@ function getEmptyCells(board) {
             var cell = board[i][j]
 
             if (!cell.isMine && !cell.isShown) {
-                emptyCells.push({ i: i, j: j })
+                emptyCells.push({ i, j })
             }
         }
     }
     return emptyCells
 }
 
+function getMineCells(board) {
+    var mineCells = []
+
+    for (let i = 0; i < board.length; i++) {
+        for (let j = 0; j < board[i].length; j++) {
+            var cell = board[i][j]
+
+            if (cell.isMine) {
+                mineCells.push({ i, j })
+            }
+        }
+    }
+    return mineCells
+}

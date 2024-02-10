@@ -1,51 +1,56 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
-    <title>Minesweeper</title>
-    <link rel="stylesheet" href="css/app.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+  <title>Minesweeper</title>
+  <link rel="stylesheet" href="css/app.css">
 
 </head>
 
 <body onload="onInit()">
-
-    <div class="game-level">
+  <div class="main-container">
+    <div class="game-controls-container">
+      <div class="game-level">
         <span>
-            <button onclick="onSetLevel(4, 2)">easy</button>
-            <button onclick="onSetLevel(8, 14)">medium</button>
-            <button onclick="onSetLevel(12, 32)">hard</button>
+          <button onclick="onSetLevel(4, 2)">easy</button>
+          <button onclick="onSetLevel(8, 14)">medium</button>
+          <button onclick="onSetLevel(12, 32)">hard</button>
         </span>
-    </div>
-
-    <div class="timer">Time:<span></span></div>
-    <div class="lives">Lives:<span></span></div>
-
-    <div class="hints">
+      </div>
+      <div class="hints">
         <button class="hint-button" onclick="onHintClicked(this)">use hint</button>
+      </div>
+      <div><button class="mega-hint-button" onclick="onMegaHintClicked(this)">mega hint</button></div>
+      <div><button class="safe-click" onclick="onSafeModeClicked(this)">safe click</button></div>
+      <div><button class="undo-button" onclick="onUndoClicked(this)">undo</button></div>
+      <!-- <div><button class="debug-button" onclick="showAllMines()">debug button</button></div> -->
+      <div><button class="exterminator" onclick="onExterminateClicked()">exterminate 3 mines</button></div>
     </div>
-
-
-    <button class="reset-button" onclick="onInit()"></button>
-
-    <table class="minefield-container">
+    <div class="main-game-container">
+      <div class="game-header-container">
+        <div class="timer">Time:<span></span></div>
+        <button class="reset-button" onclick="onInit()"></button>
+        <div class="lives">Lives:<span></span></div>
+      </div>
+      <table class="minefield-container">
         <tbody class="minefield"></tbody>
-    </table>
-
-    <div><button class="safe-click" onclick="onSafeModeClicked(this)">safe click</button></div>
-    <div><button class="mega-hint-button" onclick="onMegaHintClicked(this)">mega hint</button></div>
-    <div><button class="undo-button" onclick="onUndoClicked(this)">undo</button></div>
-    <div><button class="debug-button" onclick="showAllMines()">debug button</button></div>
-
+      </table>
+    </div>
     <div class="high-scores"></div>
-
-    <script src="js/utils.js"></script>
-    <script src="js/hints.js"></script>
-    <script src="js/scores.js"></script>
-    <script src="js/undo.js"></script>
-    <script src="js/game.js"></script>
+  </div>
+  <footer>
+    <p>created by Mark Davidovich</p>
+  </footer>
+  <script src="js/utils.js"></script>
+  <script src="js/hints.js"></script>
+  <script src="js/scores.js"></script>
+  <script src="js/undo.js"></script>
+  <script src="js/exterminator.js"></script>
+  <script src="js/game.js"></script>
 
 </body>
 
