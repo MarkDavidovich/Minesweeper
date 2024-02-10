@@ -160,7 +160,6 @@ function onCellClicked(elCell, i, j) {
 
     //----------------------------------------------------------//
     if (gIsMegaHintActive) {
-
         if (!gFirstClick) {
             gFirstClick = {
                 element: elCell,
@@ -169,35 +168,23 @@ function onCellClicked(elCell, i, j) {
             }
             console.log('gFirstClick', gFirstClick)
             gFirstClick.element.classList.add('mega-hint-cell')
-
         } else {
             gSecondClick = {
                 element: elCell,
                 i: i,
                 j: j
             }
-            console.log('gSecondClick', gSecondClick)
 
-            if (gFirstClick.i >= gSecondClick.j) {
-
-                console.log('ERROR')
-                gSecondClick.element.classList.add('mega-hint-error')
-                setTimeout(() => {
-                    gSecondClick.element.classList.remove('mega-hint-error')
-                    gSecondClick = null
-                }, 1000)
+            if (isInvalidRectangle(gFirstClick, gSecondClick)) {
+                handleMegaHintError()
                 return
-                
             }
-            gSecondClick.element.classList.add('mega-hint-cell')
         }
-
 
         if (gFirstClick && gSecondClick) {
             megaHintReveal()
         }
         return
-
     }
 
     elCell.style.outlineStyle = 'inset'
