@@ -3,12 +3,11 @@
 var gHints
 var gIsHintActive
 
-var gIsMegaHintActive
 
+var gIsMegaHintActive
 var gFirstClick
 var gSecondClick
 
-var gErrorTimeout
 
 function onHintClicked(elHintButton) {
     if (!gGame.isOn || gHints === 0) return
@@ -115,34 +114,13 @@ function megaHintReveal() {
 function handleMegaHintError() {
     console.log('ERROR')
     gSecondClick.element.classList.add('mega-hint-error')
-    setTimeout(() => {
+    gHintErrorTimeout = setTimeout(() => {
         gSecondClick.element.classList.remove('mega-hint-error')
         gSecondClick = null
     }, 500)
     console.log('gSecondClick', gSecondClick)
 }
 
-
-function cloneBoard(board) {
-    const size = board.length
-    const clonedBoard = []
-
-    for (let i = 0; i < size; i++) {
-        const row = []
-        for (let j = 0; j < board[i].length; j++) {
-            const cell = {
-                minesAroundCount: board[i][j].minesAroundCount,
-                isShown: board[i][j].isShown,
-                isMine: board[i][j].isMine,
-                isMarked: board[i][j].isMarked
-            }
-            row.push(cell)
-        }
-        clonedBoard.push(row)
-    }
-
-    return clonedBoard
-}
 
 function isInvalidRectangle(cell1, cell2) {
     return (

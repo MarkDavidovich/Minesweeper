@@ -98,6 +98,13 @@ body {
   background-color: rgba(168, 52, 52, 0.973);
   animation: blinker 1s linear infinite;
 }
+
+.undo-button {
+  background-color: rgb(44, 44, 44);
+  color: rgb(218, 218, 218);
+  font-size: 12px;
+}
+
 .debug-button {
   background-color:darkred;
 }

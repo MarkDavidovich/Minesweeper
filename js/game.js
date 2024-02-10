@@ -19,11 +19,12 @@ var gGame = {
     lives: 0
 }
 var gMinesMarked
-
 var gTimerInterval
+var gSafeClicks
+
 var gHintTimeout
 var gMegaHintTimeout
-var gSafeClicks
+var gHintErrorTimeout
 
 function onInit() {
     //lives 
@@ -42,8 +43,8 @@ function onInit() {
     updateTimer()
 
     //hints
-    var elHintButton = document.querySelector(".hint-button")
-    var elMegaHintButton = document.querySelector(".mega-hint-button")
+    var elHintButton = document.querySelector('.hint-button')
+    var elMegaHintButton = document.querySelector('.mega-hint-button')
 
     gHints = 3
     gIsHintActive = false
@@ -55,17 +56,24 @@ function onInit() {
     elMegaHintButton.style.backgroundColor = ''
     elMegaHintButton.disabled = false
     clearTimeout(gMegaHintTimeout)
+    clearTimeout(gHintErrorTimeout)
 
     gFirstClick = null
     gSecondClick = null
 
     //safe clicks
-    const elSafeButton = document.querySelector(`.safe-click`)
+    const elSafeButton = document.querySelector('.safe-click')
     elSafeButton.disabled = false
     gSafeClicks = 3
 
     //scores
     displayHighScores(gLevel.size)
+
+    //undo
+    gIsUndoAvailable = false
+    var elUndoButton = document.querySelector('.undo-button')
+    elUndoButton.disabled = true
+    gBoards = []
 
     //board init
     gMinesMarked = 0
@@ -144,21 +152,17 @@ function renderBoard(board) {
 }
 
 function onCellClicked(elCell, i, j) {
-    //Need to split this function into smaller functions... sometime
     if (!gGame.isOn) return
 
     var cellClicked = gBoard[i][j]
 
     if (cellClicked.isMarked || cellClicked.isShown) return
 
-
-
     if (gIsHintActive) {
         hintReveal(elCell, i, j)
         return
     }
 
-    //----------------------------------------------------------//
     if (gIsMegaHintActive) {
         if (!gFirstClick) {
             gFirstClick = {
@@ -198,6 +202,12 @@ function onCellClicked(elCell, i, j) {
             cellClicked = gBoard[i][j]
         }
     }
+    //undo logic
+    gIsUndoAvailable = true
+    var elUndoButton = document.querySelector('.undo-button')
+    elUndoButton.disabled = false
+    var clonedBoard = cloneBoard(gBoard)
+    addBoards(clonedBoard, gGame.lives)
 
     if (cellClicked.isMine === true) {
         clickedOnMine(elCell, cellClicked)
@@ -331,15 +341,14 @@ function revealNeighbors(board, elCell, cellI, cellJ) {
     }
 }
 
-function updateLives(diff) {
-
+function updateLives(diff = 0) {
     gGame.lives += diff
-    console.log('gGame.lives', gGame.lives)
     var elLives = document.querySelector('.lives span')
-    if (gGame.lives >= 2) elLives.innerText = '❤️'
+    if (gGame.lives === 3) elLives.innerText = '💖'
+    if (gGame.lives === 2) elLives.innerText = '❤️'
     else if (gGame.lives === 1) elLives.innerText = '❤️‍🩹'
     else if (gGame.lives === 0) {
-        elLives.innerText = '💔'
+        elLives.innerText = ''
         checkGameOver(0)
     }
 
@@ -395,6 +404,27 @@ function onSafeModeClicked() {
     return
 }
 
+function cloneBoard(board) {
+    const size = board.length
+    const clonedBoard = []
+
+    for (let i = 0; i < size; i++) {
+        const row = []
+        for (let j = 0; j < board[i].length; j++) {
+            const cell = {
+                minesAroundCount: board[i][j].minesAroundCount,
+                isShown: board[i][j].isShown,
+                isMine: board[i][j].isMine,
+                isMarked: board[i][j].isMarked
+            }
+            row.push(cell)
+        }
+        clonedBoard.push(row)
+    }
+
+    return clonedBoard
+}
+
 function getEmptyCells(board) {
     var emptyCells = []
 
@@ -409,3 +439,4 @@ function getEmptyCells(board) {
     }
     return emptyCells
 }
+
