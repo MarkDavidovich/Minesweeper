@@ -118,7 +118,7 @@ function handleMegaHintError() {
     setTimeout(() => {
         gSecondClick.element.classList.remove('mega-hint-error')
         gSecondClick = null
-    }, ONE_SECOND)
+    }, 500)
     console.log('gSecondClick', gSecondClick)
 }
 
