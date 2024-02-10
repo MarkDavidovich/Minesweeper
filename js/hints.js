@@ -114,10 +114,13 @@ function megaHintReveal() {
 function handleMegaHintError() {
     console.log('ERROR')
     gSecondClick.element.classList.add('mega-hint-error')
+    if(!gHintErrorTimeout) clearTimeout(gHintErrorTimeout)
     gHintErrorTimeout = setTimeout(() => {
         gSecondClick.element.classList.remove('mega-hint-error')
         gSecondClick = null
-    }, 500)
+    }, 300)
+    
+
     console.log('gSecondClick', gSecondClick)
 }
 
