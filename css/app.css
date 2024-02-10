@@ -82,3 +82,28 @@ body {
   color: rgb(218, 218, 218);
   font-size: 12px;
 }
+
+.mega-hint-button {
+  background-color: rgb(44, 44, 44);
+  color: rgb(218, 218, 218);
+  font-size: 12px;
+}
+
+.mega-hint-cell {
+  background-color: rgba(125, 202, 62, 0.973);
+  animation: blinker 1.5s linear infinite;
+}
+
+.mega-hint-error {
+  background-color: rgba(168, 52, 52, 0.973);
+  animation: blinker 1.5s linear infinite;
+}
+.debug-button {
+  background-color:darkred;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0.3;
+  }
+}

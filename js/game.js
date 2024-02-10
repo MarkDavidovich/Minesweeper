@@ -3,7 +3,8 @@ console.log("<------ WORK IN PRfOGRESS! ------>\n resetHighScores(4/8/12) to res
 
 const MINE = '💣'
 const FLAG = '🚩'
-const ONE_SECOND = 1000;
+const ONE_SECOND = 1000
+const TWO_SECONDS = 2000
 
 var gBoard = []
 var gLevel = {
@@ -21,6 +22,7 @@ var gMinesMarked
 
 var gTimerInterval
 var gHintTimeout
+var gMegaHintTimeout
 var gSafeClicks
 
 function onInit() {
@@ -41,11 +43,21 @@ function onInit() {
 
     //hints
     var elHintButton = document.querySelector(".hint-button")
-    elHintButton.style.backgroundColor = ''
+    var elMegaHintButton = document.querySelector(".mega-hint-button")
+
     gHints = 3
     gIsHintActive = false
     elHintButton.disabled = false
+    elHintButton.style.backgroundColor = ''
     clearTimeout(gHintTimeout)
+
+    gIsMegaHintActive = false
+    elMegaHintButton.style.backgroundColor = ''
+    elMegaHintButton.disabled = false
+    clearTimeout(gMegaHintTimeout)
+
+    gFirstClick = null
+    gSecondClick = null
 
     //safe clicks
     const elSafeButton = document.querySelector(`.safe-click`)
@@ -142,11 +154,51 @@ function onCellClicked(elCell, i, j) {
 
 
     if (gIsHintActive) {
-        
         hintReveal(elCell, i, j)
         return
     }
-    console.log('Cell clicked:', i, j)
+
+    //----------------------------------------------------------//
+    if (gIsMegaHintActive) {
+
+        if (!gFirstClick) {
+            gFirstClick = {
+                element: elCell,
+                i: i,
+                j: j
+            }
+            console.log('gFirstClick', gFirstClick)
+            gFirstClick.element.classList.add('mega-hint-cell')
+
+        } else {
+            gSecondClick = {
+                element: elCell,
+                i: i,
+                j: j
+            }
+            console.log('gSecondClick', gSecondClick)
+
+            if (gFirstClick.i >= gSecondClick.j) {
+
+                console.log('ERROR')
+                gSecondClick.element.classList.add('mega-hint-error')
+                setTimeout(() => {
+                    gSecondClick.element.classList.remove('mega-hint-error')
+                    gSecondClick = null
+                }, 1000)
+                return
+                
+            }
+            gSecondClick.element.classList.add('mega-hint-cell')
+        }
+
+
+        if (gFirstClick && gSecondClick) {
+            megaHintReveal()
+        }
+        return
+
+    }
 
     elCell.style.outlineStyle = 'inset'
 
@@ -164,14 +216,6 @@ function onCellClicked(elCell, i, j) {
         clickedOnMine(elCell, cellClicked)
     } else {
         clickedOnSafe(elCell, cellClicked, i, j)
-        // cellClicked.isShown = true
-        // gGame.shownCount++
-        // elCell.innerHTML = cellClicked.minesAroundCount > 0 ? cellClicked.minesAroundCount : ''
-        // console.log('gGame.shownCount', gGame.shownCount)
-
-        // if (cellClicked.minesAroundCount === 0) {
-        //     revealNeighbors(gBoard, elCell, i, j, true);
-        // }
     }
 
     if (gGame.shownCount === gLevel.size ** 2 - gLevel.mines) checkGameOver(1)
@@ -207,7 +251,6 @@ function onCellRightClicked(event, elCell, i, j) {
 }
 
 function checkGameOver(hasWon) {
-
     gGame.isOn = false
     var message = ''
     clearInterval(gTimerInterval)
@@ -289,10 +332,10 @@ function revealNeighbors(board, elCell, cellI, cellJ) {
             if (!currCell.isShown && !currCell.isMarked) {
                 currElement.style.outlineStyle = 'inset'
                 currCell.isShown = true
-                gGame.shownCount++
+                if (!gIsHintActive) gGame.shownCount++ // if hint click, will not increment showncount
 
                 if (!gIsHintActive && currCell.minesAroundCount === 0 && !currCell.isMine) { // if hint click, will not activate recursion
-                    revealNeighbors(board, currElement, i, j, true)
+                    revealNeighbors(board, currElement, i, j)
                 }
                 currElement.innerHTML = currCell.minesAroundCount > 0 ? currCell.minesAroundCount : ''
                 if (gIsHintActive && currCell.isMine) currElement.innerHTML = MINE // if hint click, will reveal mines
@@ -342,7 +385,7 @@ function clickedOnSafe(elCell, cellClicked, i, j) {
     }
 }
 
-function onSafeClicked() {
+function onSafeModeClicked() {
     if (!gGame.isOn) return
     const emptyCells = getEmptyCells(gBoard)
     const randIdx = getRandomIntInclusive(0, emptyCells.length - 1)
