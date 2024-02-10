@@ -9,35 +9,37 @@ var gFirstClick
 var gSecondClick
 
 
-function onHintClicked(elHintButton) {
+function onHintClicked() {
     if (!gGame.isOn || gHints === 0) return
 
     gIsHintActive = !gIsHintActive
+
+    var elHintImage = document.querySelector('.hint-image')
     if (gIsHintActive) {
-        elHintButton.style.backgroundColor = 'gray'
+        elHintImage.classList.add('hint-glow')
     } else {
-        elHintButton.style.backgroundColor = ''
+        elHintImage.classList.remove('hint-glow')
     }
 }
 
 function hintReveal(elCell, i, j) {
     const previousBoard = cloneBoard(gBoard)
-    var elHintButton = document.querySelector('.hint-button')
-
+    var elHintImage = document.querySelector('.hint-image')
+    elHintImage.classList.remove('hint-glow')
     revealNeighbors(gBoard, elCell, i, j)
-    elHintButton.disabled = true
+    elHintImage.disabled = true
     gHintTimeout = setTimeout(() => {
-        console.log("ONE SECOND HAS PASSED")
         gBoard = previousBoard
         renderBoard(gBoard)
-        if (gHints) elHintButton.disabled = false
+        if (gHints) elHintImage.disabled = false
     }, ONE_SECOND)
 
     gHints--
-    console.log('gHints', gHints)
+    hintButtonUpdate()
+
     gIsHintActive = false
 
-    elHintButton.style.backgroundColor = ''
+    elHintImage.style.backgroundColor = ''
     startTimer()
 }
 
@@ -47,7 +49,6 @@ function onMegaHintClicked(elMegaHintButton) {
 
     gIsMegaHintActive = !gIsMegaHintActive
 
-    console.log(gIsMegaHintActive)
     if (gIsMegaHintActive) {
         elMegaHintButton.style.backgroundColor = 'gray'
     } else {
@@ -91,7 +92,6 @@ function megaHintReveal() {
     }
 
     if (!validFlag) {
-        console.log('invalid rectangle!')
         handleMegaHintError() 
         return
     }
@@ -101,7 +101,6 @@ function megaHintReveal() {
    
 
     gMegaHintTimeout = setTimeout(() => {
-        console.log("TWO SECONDS HAVE PASSED")
         gBoard = previousBoard
         renderBoard(gBoard)
     }, TWO_SECONDS)
@@ -112,7 +111,6 @@ function megaHintReveal() {
 }
 
 function handleMegaHintError() {
-    console.log('ERROR')
     gSecondClick.element.classList.add('mega-hint-error')
     if(!gHintErrorTimeout) clearTimeout(gHintErrorTimeout)
     gHintErrorTimeout = setTimeout(() => {
@@ -121,7 +119,6 @@ function handleMegaHintError() {
     }, 300)
     
 
-    console.log('gSecondClick', gSecondClick)
 }
 
 
@@ -131,4 +128,12 @@ function isInvalidRectangle(cell1, cell2) {
         (cell1.i === cell2.j && cell1.j === cell2.i) 
         
     )
+}
+
+function hintButtonUpdate() {
+    var elHints = document.querySelector('.hint-image')
+    if (gHints === 3) elHints.src = 'assets/lightbulb/lightbulbfull.png'
+    else if (gHints === 2) elHints.src = 'assets/lightbulb/lightbulbalmostfull.png'
+    else if (gHints === 1) elHints.src = 'assets/lightbulb/lightbulbalmostempty.png'
+    else if (gHints === 0)  elHints.src = 'assets/lightbulb/lightbulbempty.png' 
 }

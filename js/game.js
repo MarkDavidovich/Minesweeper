@@ -32,7 +32,7 @@ function onInit() {
     var elLives = document.querySelector(".lives span")
 
     elWinEmoji.innerHTML = '😀'
-    elLives.innerHTML = '<img src="assets/fullheart.png">' 
+    elLives.innerHTML = '<img src="assets/heart/fullheart.png">' 
     gGame.lives = 3
 
 
@@ -43,13 +43,14 @@ function onInit() {
     updateTimer()
 
     //hints
-    var elHintButton = document.querySelector('.hint-button')
+    var elHintButton = document.querySelector('.hint-image')
     var elMegaHintButton = document.querySelector('.mega-hint-button')
 
     gHints = 3
     gIsHintActive = false
     elHintButton.disabled = false
-    elHintButton.style.backgroundColor = ''
+    elHintButton.classList.remove('hint-glow')
+    hintButtonUpdate()
     clearTimeout(gHintTimeout)
 
     gIsMegaHintActive = false
@@ -174,7 +175,6 @@ function onCellClicked(elCell, i, j) {
                 i: i,
                 j: j
             }
-            console.log('gFirstClick', gFirstClick)
             gFirstClick.element.classList.add('mega-hint-cell')
         } else {
             gSecondClick = {
@@ -201,7 +201,6 @@ function onCellClicked(elCell, i, j) {
         startTimer()
 
         while (cellClicked.isMine) { //makes sure the first cell clicked is not a mine
-            console.log('FIRST CELL WAS A MINE!')
             gBoard = buildBoard()
             cellClicked = gBoard[i][j]
         }
@@ -262,7 +261,6 @@ function checkGameOver(hasWon) {
         var elWinEmoji = document.querySelector(".reset-button")
         elWinEmoji.innerHTML = '😎'
         message = "You won!"
-        console.log(gGame.shownCount, gGame.secsPassed)
         updateHighScores(gLevel.size, gGame.shownCount, gGame.secsPassed)
     } else {
         var elWinEmoji = document.querySelector(".reset-button")
@@ -358,11 +356,11 @@ function revealNeighbors(board, elCell, cellI, cellJ) {
 function updateLives(diff = 0) {
     gGame.lives += diff
     var elLives = document.querySelector('.lives span')
-    if (gGame.lives === 3) elLives.innerHTML = '<img src="assets/fullheart.png">' 
-    if (gGame.lives === 2) elLives.innerHTML = '<img src="assets/twothirdsheart.png">' 
-    else if (gGame.lives === 1) elLives.innerHTML = '<img src="assets/onethirdsheart.png">' 
+    if (gGame.lives === 3) elLives.innerHTML = '<img src="assets/heart/fullheart.png">' 
+    if (gGame.lives === 2) elLives.innerHTML = '<img src="assets/heart/twothirdsheart.png">' 
+    else if (gGame.lives === 1) elLives.innerHTML = '<img src="assets/heart/onethirdsheart.png">' 
     else if (gGame.lives === 0) {
-        elLives.innerHTML = '<img src="assets/emptyheart.png">' 
+        elLives.innerHTML = '<img src="assets/heart/emptyheart.png">' 
         checkGameOver(0)
     }
 
@@ -371,7 +369,6 @@ function updateLives(diff = 0) {
 function startTimer() {
     if (!gTimerInterval) {
         gTimerInterval = setInterval(updateTimer, ONE_SECOND)
-        console.log("TIMER STARTED!")
     }
 }
 
@@ -388,7 +385,6 @@ function clickedOnSafe(elCell, cellClicked, i, j) {
     cellClicked.isShown = true
     gGame.shownCount++
     elCell.innerHTML = cellClicked.minesAroundCount > 0 ? cellClicked.minesAroundCount : ''
-    console.log('gGame.shownCount', gGame.shownCount)
 
     if (cellClicked.minesAroundCount === 0) {
         revealNeighbors(gBoard, elCell, i, j, true);
@@ -404,8 +400,6 @@ function onSafeModeClicked() {
     const elSafeButton = document.querySelector(`.safe-click`)
     //Show the safe cell for a few seconds
     elCell.classList.add("safe-cell")
-    console.log('elCell', elCell)
-    console.log("randomSafeCell:", randomSafeCell)
     elSafeButton.disabled = true
 
     setTimeout(() => {

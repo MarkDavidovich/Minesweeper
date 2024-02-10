@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -21,9 +20,8 @@
           <button onclick="onSetLevel(12, 32)">hard</button>
         </span>
       </div>
-      <div class="hints">
-        <button class="hint-button" onclick="onHintClicked(this)">use hint</button>
-      </div>
+
+      <div><button class="hint-button"  onclick="onHintClicked()"><img class = "hint-image" src="assets/lightbulb/lightbulbfull.png"></button></div>
       <div><button class="mega-hint-button" onclick="onMegaHintClicked(this)">mega hint</button></div>
       <div><button class="safe-click" onclick="onSafeModeClicked(this)">safe click</button></div>
       <div><button class="undo-button" onclick="onUndoClicked(this)">undo</button></div>
@@ -34,7 +32,7 @@
       <div class="game-header-container">
         <div class="timer">Time:<span></span></div>
         <button class="reset-button" onclick="onInit()"></button>
-        <div class="lives">Lives:<span></span></div>
+        <div class="lives"><span></span></div>
       </div>
       <table class="minefield-container">
         <tbody class="minefield"></tbody>
@@ -43,7 +41,7 @@
     <div class="high-scores"></div>
   </div>
   <footer>
-    <p>created by Mark Davidovich</p>
+    <a class="link" href="https://github.com/MarkDavidovich/Minesweeper" target="_blank">created by Mark Davidovich</a>
   </footer>
   <script src="js/utils.js"></script>
   <script src="js/hints.js"></script>
