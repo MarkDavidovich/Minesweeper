@@ -43,13 +43,14 @@ function onInit() {
     updateTimer()
 
     //hints
-    var elHintButton = document.querySelector('.hint-image')
+    var elHintButton = document.querySelector('.hint-button')
+    var elHintButtonImage = document.querySelector('.hint-image')
     var elMegaHintButton = document.querySelector('.mega-hint-button')
 
     gHints = 3
     gIsHintActive = false
     elHintButton.disabled = false
-    elHintButton.classList.remove('hint-glow')
+    elHintButtonImage.classList.remove('hint-glow')
     hintButtonUpdate()
     clearTimeout(gHintTimeout)
 
